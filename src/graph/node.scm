@@ -42,6 +42,3 @@ TODO: write some docs
 
 (define node:create
   (type-instantiator node?))
-
-(define (node:equal? node1 node2)
-  (equal? (node:get-label node1) (node:get-label node2)))

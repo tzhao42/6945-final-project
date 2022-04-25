@@ -70,6 +70,3 @@ TODO : docs
 
 (define edge:create
   (type-instantiator edge?))
-
-(define (edge:equal? edge1 edge2)
-  (equal? (edge:get-label edge1) (edge:get-label edge2)))
