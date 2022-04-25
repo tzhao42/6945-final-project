@@ -1,4 +1,3 @@
-
 (with-working-directory-pathname
  (directory-pathname (current-load-pathname))
  (lambda ()
@@ -33,5 +32,3 @@
       "graph/node"
       "graph/edge"
       "graph/graph"))))
-
-

@@ -41,8 +41,22 @@ TODO : docs
 (define edge:get-destination
   (property-getter edge:destination edge?))
 
+(define (edge:get-nodes edge)
+  (guarantee edge? edge)
+  (cons (edge:get-source edge) (edge:get-destination edge)))
+  
 (define edge:set-data
   (property-setter edge:data edge? object?))
+
+(define edge:set-source
+  (property-setter edge:source edge? node?))
+
+(define edge:set-destination
+  (property-setter edge:destination edge? node?))
+
+(define (edge:set-nodes edge source destination)
+  (edge:set-source edge source)
+  (edge:set-destination edge destination))
 
 (define edge:create
   (type-instantiator edge?))
