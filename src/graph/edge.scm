@@ -3,6 +3,14 @@
 TODO : docs
 |#
 
+(define (generate-edge-id)
+  (generate-uninterned-symbol "edge-"))
+
+(define edge:id
+  (make-property 'id
+                 'predicate symbol?
+                 'default-supplier generate-edge-id)) 
+
 (define (edge-label? x)
   (or (string? x) (exact-nonnegative-integer? x)))
 (register-predicate! edge-label? 'edge-label)
@@ -25,8 +33,11 @@ TODO : docs
                  'predicate node?))
 
 (define edge?
-  (make-type 'edge (list edge:source edge:destination edge:data edge:label)))
+  (make-type 'edge (list edge:id edge:label edge:data edge:source edge:destination)))
 (set-predicate<=! edge? object?)
+
+(define edge:get-id
+  (property-getter edge:id edge?))
 
 (define edge:get-label
   (property-getter edge:label edge?))

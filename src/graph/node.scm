@@ -3,6 +3,14 @@
 TODO: write some docs
 |#
 
+(define (generate-node-id)
+  (generate-uninterned-symbol "node-"))
+
+(define node:id
+  (make-property 'id
+                 'predicate symbol?
+                 'default-supplier generate-node-id)) 
+
 (define (node-label? x)
   (or (string? x) (exact-nonnegative-integer? x)))
 (register-predicate! node-label? 'node-label)
@@ -17,8 +25,11 @@ TODO: write some docs
                  'default-value '()))
 
 (define node?
-  (make-type 'node (list node:label node:data)))
+  (make-type 'node (list node:id node:label node:data)))
 (set-predicate<=! node? object?)
+
+(define node:get-id
+  (property-getter node:id node?))
 
 (define node:get-data
   (property-getter node:data node?))
