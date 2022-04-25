@@ -28,12 +28,12 @@
 (define graph:get-edges
   (property-getter graph:edges graph?))
 
-(define (graph:contains-node node graph)
+(define (graph:contains-node? node graph)
   (guarantee node? node)
   (guarantee graph? graph)
   (and (memv node (graph:get-nodes graph)) #t))
 
-(define (graph:contains-edge edge graph)
+(define (graph:contains-edge? edge graph)
   (guarantee edge? edge)
   (guarantee graph? graph)
   (and (memv edge (graph:get-edges graph)) #t))
