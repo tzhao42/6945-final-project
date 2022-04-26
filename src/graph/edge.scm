@@ -71,8 +71,8 @@ TODO : docs
   (type-instantiator edge?))
 
 (define (edge:has-node? edge node)
-  (guarantee node? node)
   (guarantee edge? edge)
+  (guarantee node? node)
   (or (equal? (edge:source edge) node)
       (equal? (edge:destination edge) node)))
 
