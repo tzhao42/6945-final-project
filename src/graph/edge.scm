@@ -70,3 +70,18 @@ TODO : docs
 
 (define edge:create
   (type-instantiator edge?))
+
+(define (edge:has-node? node edge)
+  (guarantee node? node)
+  (guarantee edge? edge)
+  (or (equal? (edge:source edge) node)
+      (equal? (edge:destination edge) node)))
+
+(define-generic-procedure-handler tagged-data-representation
+  (match-args edge?)
+  (lambda (super edge)
+    (list (edge:get-label edge)
+          (node:get-label (edge:get-source edge)) (quote ->)
+          (node:get-label (edge:get-destination edge))
+          'data (edge:get-data edge))))
+

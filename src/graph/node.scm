@@ -42,3 +42,8 @@ TODO: write some docs
 
 (define node:create
   (type-instantiator node?))
+
+(define-generic-procedure-handler tagged-data-representation
+  (match-args node?)
+  (lambda (super node)
+    (list (node:get-label node) 'data (node:get-data node))))
