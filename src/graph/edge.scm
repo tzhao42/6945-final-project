@@ -76,6 +76,25 @@ TODO : docs
   (or (equal? (edge:source edge) node)
       (equal? (edge:destination edge) node)))
 
+(define (edge:eqv? e1 e2)
+  (guarantee edge? e1)
+  (guarantee edge? e2)
+  (and
+   (equal? (edge:get-id e1) (edge:get-id e2))
+   (equal? (edge:get-label e1) (edge:get-label e2))
+   (equal? (edge:get-data e1) (edge:get-data e2))
+   (node:equal? (edge:get-source e1) (edge:get-source e2))
+   (node:equal? (edge:get-destination e1) (edge:get-destination e2))))
+
+(define (edge:equal? e1 e2)
+  (guarantee edge? e1)
+  (guarantee edge? e2)
+  (and
+   (equal? (edge:get-label e1) (edge:get-label e2))
+   (equal? (edge:get-data e1) (edge:get-data e2))
+   (node:equal? (edge:get-source e1) (edge:get-source e2))
+   (node:equal? (edge:get-destination e1) (edge:get-destination e2))))
+
 (define-generic-procedure-handler tagged-data-representation
   (match-args edge?)
   (lambda (super edge)

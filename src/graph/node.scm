@@ -42,6 +42,19 @@ TODO: write some docs
 (define node:create
   (type-instantiator node?))
 
+(define (node:eqv? n1 n2)
+  (guarantee node? n1)
+  (guarantee node? n2)
+  (and (equal? (node:get-id n1) (node:get-id n2))
+       (equal? (node:get-label n1) (node:get-label n2))
+       (equal? (node:get-data n1) (node:get-data n2))))
+
+(define (node:equal? n1 n2)
+  (guarantee node? n1)
+  (guarantee node? n2)
+  (and (equal? (node:get-label n1) (node:get-label n2))
+       (equal? (node:get-data n1) (node:get-data n2))))
+  
 (define-generic-procedure-handler tagged-data-representation
   (match-args node?)
   (lambda (super node)
