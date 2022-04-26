@@ -13,7 +13,6 @@ TODO: write some docs
 
 (define (node-label? x)
   (or (string? x) (exact-nonnegative-integer? x)))
-(register-predicate! node-label? 'node-label)
 
 (define node:label
   (make-property 'label
@@ -21,7 +20,7 @@ TODO: write some docs
 
 (define node:data
   (make-property 'data
-                 'predicate object?
+                 'predicate any-object?
                  'default-value '()))
 
 (define node?
@@ -38,7 +37,7 @@ TODO: write some docs
   (property-getter node:label node?))
 
 (define node:set-data
-  (property-setter node:data node? object?))
+  (property-setter node:data node? any-object?))
 
 (define node:create
   (type-instantiator node?))

@@ -13,7 +13,6 @@ TODO : docs
 
 (define (edge-label? x)
   (or (string? x) (exact-nonnegative-integer? x)))
-(register-predicate! edge-label? 'edge-label)
 
 (define edge:label
   (make-property 'label
@@ -21,7 +20,7 @@ TODO : docs
 
 (define edge:data
   (make-property 'data
-                 'predicate object?
+                 'predicate any-object?
                  'default-value '()))
 
 (define edge:source
@@ -56,7 +55,7 @@ TODO : docs
   (cons (edge:get-source edge) (edge:get-destination edge)))
   
 (define edge:set-data
-  (property-setter edge:data edge? object?))
+  (property-setter edge:data edge? any-object?))
 
 (define edge:set-source
   (property-setter edge:source edge? node?))
@@ -71,7 +70,7 @@ TODO : docs
 (define edge:create
   (type-instantiator edge?))
 
-(define (edge:has-node? node edge)
+(define (edge:has-node? edge node)
   (guarantee node? node)
   (guarantee edge? edge)
   (or (equal? (edge:source edge) node)
