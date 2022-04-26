@@ -2,6 +2,22 @@
 
 |#
 
+;;;; Utils (TODO: separate file?)
+
+(define (all-distinct? lst)
+  (if (< (length lst) 2)
+      #t
+      (and (not (member (car lst) (cdr lst)))
+           (all-distinct? (cdr lst)))))
+;; test cases
+(all-distinct? '(1 "a" c)) ; -> #t
+(all-distinct? '()) ; -> #t
+(all-distinct? '(1)) ; -> #t
+(all-distinct? '("a" "a")) ; -> #f
+(all-distinct? '(c c)) ; -> #f
+
+;;;; Graph Properties
+
 (define (list-of-nodes? lst)
   (and (list? lst) (for-all? lst node?)))
 
@@ -18,15 +34,62 @@
                  'predicate list-of-edges?
                  'default-value '()))
 
+;;;; Graph creation
+
 (define graph?
   (make-type 'graph (list graph:nodes graph:edges)))
 (set-predicate<=! graph? object?)
 
+(define %graph:create
+  (type-instantiator graph?))
+
+(define (graph:create . plist)
+  (let* ((g (apply %graph:create plist))
+         (nodes (graph:get-nodes g))
+         (edges (graph:get-edges g)))
+    (assert (valid-graph-components? nodes edges))
+    g))
+
+;;;; Graph item retrieval
+
 (define graph:get-nodes
   (property-getter graph:nodes graph?)) 
 
+(define (graph:label->node graph node-label)
+  (guarantee graph? graph)
+  (guarantee node-label? node-label)
+  (find (lambda (node) (equal? node-label (node:get-label node)))
+        (graph:get-nodes graph)))
+
+(define (graph:get-outgoing-edges graph node)
+  (guarantee graph? graph)
+  (guarantee node? node)
+  (let ((edges (graph:get-edges graph)))
+    (filter (lambda (edge)
+              (equal? node (edge:get-source edge))))))
+
+(define (graph:get-incoming-edges graph node)
+  (guarantee graph? graph)
+  (guarantee node? node)
+  (let ((edges (graph:get-edges graph)))
+    (filter (lambda (edge)
+              (equal? node (edge:get-destination edge))))))
+
+(define (graph:get-node-edges graph node)
+  (guarantee graph? graph)
+  (guarantee node? node)
+  (append (graph:get-outgoing-edges graph node) (graph:get-incoming-edges graph node)))
+
 (define graph:get-edges
   (property-getter graph:edges graph?))
+
+(define (graph:label->edge graph edge-label)
+  (guarantee graph? graph)
+  (guarantee edge-label? edge-label)
+  (find (lambda (edge) (equal? edge-label (edge:get-label edge)))
+        (graph:get-edges graph)))
+
+;;;; Graph predicates
 
 (define (graph:contains-node? graph node)
   (guarantee graph? graph)
@@ -35,12 +98,24 @@
         (existing-node-ids (map node:get-id (graph:get-nodes graph))))
     (and (memv query-node-id existing-node-ids) #t)))
 
+(define (graph:contains-node-label? graph query-label)
+  (guarantee graph? graph)
+  (guarantee node-label? query-label)
+  (let ((existing-node-labels (map node:get-label (graph:get-nodes graph))))
+    (and (memv query-label existing-node-labels) #t)))
+
 (define (graph:contains-edge? graph edge)
   (guarantee graph? graph)
   (guarantee edge? edge)
   (let ((query-edge-id (edge:get-id edge))
         (existing-edge-ids (map edge:get-id (graph:get-edges graph))))
     (and (memv query-edge-id existing-edge-ids) #t)))
+
+(define (graph:contains-edge-label? graph query-label)
+  (guarantee graph? graph)
+  (guarantee edge-label? query-label)
+  (let ((existing-edge-labels (map edge:get-label (graph:get-edges graph))))
+    (and (memv query-label existing-edge-labels) #t)))
 
 (define (valid-graph? graph)
   (let ((nodes (graph:get-nodes graph))
@@ -50,11 +125,15 @@
 (define (valid-graph-components? nodes edges)
   (guarantee list-of-nodes? nodes)
   (guarantee list-of-edges? edges)
+  (guarantee all-distinct? (map node:get-label nodes))
+  (guarantee all-distinct? (map edge:get-label edges))
   (let* ((edge-sources (map edge:get-source edges))
          (edge-dests (map edge:get-destination edges))
          (edge-nodes (append edge-sources edge-dests)))
     (for-all? edge-nodes (lambda (node) (and (memv node nodes) #t)))))
     
+;;; Graph modifiers
+
 (define %graph:set-nodes
   (property-setter graph:nodes graph? list-of-nodes?))
 
@@ -68,16 +147,6 @@
 (define (graph:set-edges graph edges)
   (assert (valid-graph-components? (graph:get-nodes graph) edges))
   (%graph:set-edges graph edges))
-
-(define %graph:create
-  (type-instantiator graph?))
-
-(define (graph:create . plist)
-  (let* ((g (apply %graph:create plist))
-         (nodes (graph:get-nodes g))
-         (edges (graph:get-edges g)))
-    (assert (valid-graph-components? nodes edges))
-    g))
 
 (define (graph:add-node graph node)
   (guarantee graph? graph)
