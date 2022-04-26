@@ -30,3 +30,13 @@
 (define empty-graph (graph:create))
 
 (define no-label-node (node:create))
+
+(graph:get-nodes empty-graph)
+(%graph:set-nodes empty-graph (list alice))
+(graph:get-nodes empty-graph)
+
+(pp good-abe-graph)
+(graph:get-edges good-abe-graph)
+(graph:remove-edge good-abe-graph ab-edge)
+(pp good-abe-graph)
+
