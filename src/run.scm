@@ -40,3 +40,4 @@
 (graph:remove-edge good-abe-graph ab-edge)
 (pp good-abe-graph)
 
+(graph:update good-abe-graph)

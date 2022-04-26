@@ -31,4 +31,5 @@
     '("graph/object"
       "graph/node"
       "graph/edge"
-      "graph/graph"))))
+      "graph/graph"
+      "graph/update"))))
