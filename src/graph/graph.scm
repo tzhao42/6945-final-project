@@ -50,6 +50,9 @@
     (assert (valid-graph-components? nodes edges))
     g))
 
+(define (graph:copy graph)
+  (graph:create 'nodes (graph:get-nodes graph) 'edges (graph:get-edges graph)))
+
 ;;;; Graph item retrieval
 
 (define graph:get-nodes
@@ -132,6 +135,12 @@
          (edge-nodes (append edge-sources edge-dests)))
     (for-all? edge-nodes (lambda (node) (and (memv node nodes) #t)))))
     
+(define (graph:equal? g1 g2)
+  (and
+   (lset= node:equal? (graph:get-nodes g1) (graph:get-nodes g2))
+   (lset= edge:equal? (graph:get-edges g1) (graph:get-edges g2))))
+     
+
 ;;; Graph modifiers
 
 (define %graph:set-nodes
