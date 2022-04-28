@@ -42,6 +42,11 @@ TODO: write some docs
 (define node:create
   (type-instantiator node?))
 
+(define (node:copy node)
+  (node:create 'id (node:get-id node)
+               'label (node:get-label node)
+               'data (node:get-data node)))
+
 (define (node:eqv? n1 n2)
   (guarantee node? n1)
   (guarantee node? n2)

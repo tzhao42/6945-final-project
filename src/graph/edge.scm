@@ -70,11 +70,18 @@ TODO : docs
 (define edge:create
   (type-instantiator edge?))
 
+(define (edge:copy edge)
+  (edge:create 'id (edge:get-id edge)
+               'label (edge:get-label edge)
+               'data (edge:get-data edge)
+               'source (edge:get-source edge)
+               'destination (edge:get-destination edge)))
+
 (define (edge:has-node? edge node)
   (guarantee edge? edge)
   (guarantee node? node)
-  (or (equal? (edge:source edge) node)
-      (equal? (edge:destination edge) node)))
+  (or (node:equal? (edge:get-source edge) node)
+      (node:equal? (edge:get-destination edge) node)))
 
 (define (edge:eqv? e1 e2)
   (guarantee edge? e1)
