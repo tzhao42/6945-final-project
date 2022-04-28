@@ -56,11 +56,11 @@
          (node-copy-alist (map cons nodes node-copies))
          (edge-copies (map edge:copy (graph:get-edges graph))))
     (for-each (lambda (edge)
-                (edge:set-source
+                (edge:set-source!
                  edge
                  (cdr
                   (assv (edge:get-source edge) node-copy-alist)))
-                (edge:set-destination
+                (edge:set-destination!
                  edge
                  (cdr
                   (assv (edge:get-destination edge) node-copy-alist))))
@@ -170,57 +170,56 @@
    (lset= node:equal? (graph:get-nodes g1) (graph:get-nodes g2))
    (lset= edge:equal? (graph:get-edges g1) (graph:get-edges g2))))
      
-
 ;;; Graph modifiers
 
-(define %graph:set-nodes
+(define %graph:set-nodes!
   (property-setter graph:nodes graph? list-of-nodes?))
 
-(define (graph:set-nodes nodes graph)
+(define (graph:set-nodes! nodes graph)
   (assert (valid-graph-components? nodes (graph:get-edges graph)))
-  (%graph:set-nodes graph nodes))
+  (%graph:set-nodes! graph nodes))
 
-(define %graph:set-edges
+(define %graph:set-edges!
   (property-setter graph:edges graph? list-of-edges?))
 
-(define (graph:set-edges graph edges)
+(define (graph:set-edges! graph edges)
   (assert (valid-graph-components? (graph:get-nodes graph) edges))
-  (%graph:set-edges graph edges))
+  (%graph:set-edges! graph edges))
 
-(define (graph:add-node graph node)
+(define (graph:add-node! graph node)
   (guarantee graph? graph)
   (guarantee node? node)
   (if (graph:contains-node? graph node)
       (error "Graph already contains node. If you want to replace the node, consider graph:replace-node")
-      (graph:set-nodes graph (cons node (graph:get-nodes graph)))))
+      (graph:set-nodes! graph (cons node (graph:get-nodes graph)))))
       
-(define (graph:add-edge graph edge)
+(define (graph:add-edge! graph edge)
   (guarantee graph? graph)
   (guarantee edge? edge)
   (if (graph:contains-edge? graph edge)
       (error "Graph already contains edge. If you want to replace the edge, consider graph:replace-node")
-      (graph:set-edges graph (cons edge (graph:get-edges graph)))))
+      (graph:set-edges! graph (cons edge (graph:get-edges graph)))))
 
-(define (graph:remove-node graph node)
+(define (graph:remove-node! graph node)
   (guarantee graph? graph)
   (guarantee node? node)
   (if (graph:contains-node? graph node)
       (let ((relevant-edges (filter (lambda (edge) (edge:has-node? edge node))
                                     (graph:get-edges graph))))
         (graph:remove-edges graph relevant-edges)
-        (graph:set-nodes graph (remove node (graph:get-nodes))))
+        (graph:set-nodes! graph (remove node (graph:get-nodes))))
       (error "Graph does not contain node")))
       
-(define (graph:remove-edge graph edge)
+(define (graph:remove-edge! graph edge)
   (guarantee graph? graph)
   (guarantee edge? edge)
   (if (graph:contains-edge? graph edge)
-      (graph:remove-edges graph (list edge))
+      (graph:remove-edges! graph (list edge))
       (error "Graph does not contain edge")))
 
-(define (graph:remove-edges graph edges)
+(define (graph:remove-edges! graph edges)
   (guarantee graph? graph)
   (guarantee list-of-edges? edges)
   (let ((new-edges (filter (lambda (edge) (not (memv edge edges)))
                            (graph:get-edges graph))))
-    (graph:set-edges graph new-edges)))
+    (graph:set-edges! graph new-edges)))

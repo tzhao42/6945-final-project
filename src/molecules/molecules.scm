@@ -21,10 +21,10 @@
 (define atom:get-type
   (property-getter atom:type atom?))
 
-(define atom:set-charge
+(define atom:set-charge!
   (property-setter atom:charge atom? n:exact-integer?))
 
-(define atom:set-type
+(define atom:set-type!
   (property-setter atom:type atom? symbol?))
 
 (define atom:create
@@ -97,25 +97,25 @@
        (> (get-max-neighbor-charge graph atom) 0)
        (< (atom:get-charge atom) 0)))
          
-(define-generic-procedure-handler node:update
+(define-generic-procedure-handler node:update!
   (match-args graph? atom?)
   (lambda (mol atom)
     (cond ((resonance-center? mol atom)
            (let* ((sink (get-max-charge-neighbor mol atom))
                   (source (get-min-charge-neighbor mol atom))
                   (old-bond (car (graph:get-edges-from-nodes mol source atom))))
-             (atom:set-charge source (+ (atom:get-charge source) 1))
-             (atom:set-charge sink (- (atom:get-charge sink) 1))
-             (graph:remove-edge mol old-bond)
-             (graph:add-edge mol (edge:create 'label (generate-uninterned-symbol "resonance-edge-")
-                                              'source atom
-                                              'destination sink))))
+             (atom:set-charge! source (+ (atom:get-charge source) 1))
+             (atom:set-charge! sink (- (atom:get-charge sink) 1))
+             (graph:remove-edge! mol old-bond)
+             (graph:add-edge! mol (edge:create 'label (generate-uninterned-symbol "resonance-edge-")
+                                               'source atom
+                                               'destination sink))))
           ((neighbor-bond-receiver? mol atom)
            (let* ((source (get-min-charge-neighbor mol atom))
                   (sink atom))
-             (atom:set-charge source (+ (atom:get-charge source) 1))
-             (atom:set-charge sink (- (atom:get-charge sink) 1))
-             (graph:add-edge mol (edge:create 'label
+             (atom:set-charge! source (+ (atom:get-charge source) 1))
+             (atom:set-charge! sink (- (atom:get-charge sink) 1))
+             (graph:add-edge! mol (edge:create 'label
                                               (generate-uninterned-symbol "bond-formation-edge-")
                                               'source sink
                                               'destination source))))

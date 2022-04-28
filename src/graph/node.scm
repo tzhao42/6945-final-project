@@ -36,7 +36,7 @@ TODO: write some docs
 (define node:get-label
   (property-getter node:label node?))
 
-(define node:set-data
+(define node:set-data!
   (property-setter node:data node? any-object?))
 
 (define node:create

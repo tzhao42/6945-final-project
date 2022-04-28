@@ -35,32 +35,32 @@
 (define no-label-node (node:create))
 
 (graph:get-nodes empty-graph)
-(%graph:set-nodes empty-graph (list alice))
+(%graph:set-nodes! empty-graph (list alice))
 (graph:get-nodes empty-graph)
 
 (pp good-abe-graph)
 (graph:get-edges good-abe-graph)
-(graph:remove-edge good-abe-graph ab-edge)
+(graph:remove-edge! good-abe-graph ab-edge)
 (pp good-abe-graph)
 
-(graph:update good-abe-graph)
+(graph:update! good-abe-graph)
 
-(define-generic-procedure-handler node:update
+(define-generic-procedure-handler node:update!
   (match-args graph? node?)
   (lambda (graph node)
-    (node:set-data node (+ 1 (node:get-data node)))
+    (node:set-data! node (+ 1 (node:get-data node)))
     (values))) 
 
 (define debug-output #f)
 (define good-abe-graph-2 (graph:copy good-abe-graph))
 (pp good-abe-graph)
 (pp good-abe-graph-2)
-(graph:converge good-abe-graph)
+(graph:converge! good-abe-graph)
 (graph:equal? good-abe-graph good-abe-graph-2)
 (equal*? good-abe-graph good-abe-graph)
 (equal*? good-abe-graph good-abe-graph-2)
 
-(define equilib-graph-set (graph:equilibrate good-abe-graph))
+(define equilib-graph-set (graph:equilibrate! good-abe-graph))
 (for-each pp equilib-graph-set)
 
 
@@ -85,8 +85,11 @@
       (for-each (lambda (node) (pp (graph:get-neighbors g node))) (list c1 c2 c3))
       g)))
       
-(%graph:single-update allylic-cation)
+(%graph:single-update! allylic-cation)
 (pp allylic-cation)
+(graph:converge! allylic-cation)
+(pp (graph:equilibrate! allylic-cation))
+
 
 (define ketene
   (let ((c1 (atom:create 'type 'C 'charge -1 'label "c1"))
@@ -109,7 +112,7 @@
       (for-each (lambda (node) (pp (graph:get-neighbors g node))) (list c1 c2 c3))
       g)))
 
-(%graph:single-update ketene)
+(%graph:single-update! ketene)
 (pp ketene)
 
 
@@ -123,5 +126,5 @@
                                                    'destination c2)))))
       g)))
 
-(%graph:single-update ethene)
+(%graph:single-update! ethene)
 (pp ethene)

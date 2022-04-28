@@ -54,16 +54,16 @@ TODO : docs
   (guarantee edge? edge)
   (cons (edge:get-source edge) (edge:get-destination edge)))
   
-(define edge:set-data
+(define edge:set-data!
   (property-setter edge:data edge? any-object?))
 
-(define edge:set-source
+(define edge:set-source!
   (property-setter edge:source edge? node?))
 
-(define edge:set-destination
+(define edge:set-destination!
   (property-setter edge:destination edge? node?))
 
-(define (edge:set-nodes edge source destination)
+(define (edge:set-nodes! edge source destination)
   (edge:set-source edge source)
   (edge:set-destination edge destination))
 
