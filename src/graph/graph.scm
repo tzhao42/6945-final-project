@@ -73,6 +73,12 @@
 (define graph:get-nodes
   (property-getter graph:nodes graph?)) 
 
+(define (graph:id->node graph node-id)
+  (guarantee graph? graph)
+  (guarantee symbol? node-id)
+  (find (lambda (node) (equal? node-id (node:get-id node)))
+        (graph:get-nodes graph)))
+
 (define (graph:label->node graph node-label)
   (guarantee graph? graph)
   (guarantee node-label? node-label)
