@@ -51,7 +51,22 @@
     g))
 
 (define (graph:copy graph)
-  (graph:create 'nodes (graph:get-nodes graph) 'edges (graph:get-edges graph)))
+  (let* ((nodes (graph:get-nodes graph))
+         (node-copies (map node:copy nodes))
+         (node-copy-alist (map cons nodes node-copies))
+         (edge-copies (map edge:copy (graph:get-edges graph))))
+    (for-each (lambda (edge)
+                (edge:set-source
+                 edge
+                 (cdr
+                  (assv (edge:get-source edge) node-copy-alist)))
+                (edge:set-destination
+                 edge
+                 (cdr
+                  (assv (edge:get-destination edge) node-copy-alist))))
+              edge-copies)
+    (graph:create 'nodes node-copies
+                  'edges edge-copies)))
 
 ;;;; Graph item retrieval
 
@@ -69,20 +84,29 @@
   (guarantee node? node)
   (let ((edges (graph:get-edges graph)))
     (filter (lambda (edge)
-              (equal? node (edge:get-source edge))))))
+              (equal? node (edge:get-source edge)))
+            (graph:get-edges graph))))
 
 (define (graph:get-incoming-edges graph node)
   (guarantee graph? graph)
   (guarantee node? node)
   (let ((edges (graph:get-edges graph)))
     (filter (lambda (edge)
-              (equal? node (edge:get-destination edge))))))
+              (equal? node (edge:get-destination edge)))
+            (graph:get-edges graph))))
 
 (define (graph:get-node-edges graph node)
   (guarantee graph? graph)
   (guarantee node? node)
   (append (graph:get-outgoing-edges graph node) (graph:get-incoming-edges graph node)))
 
+(define (graph:get-neighbors graph node)
+  (guarantee graph? graph)
+  (guarantee node? node)
+  (lset-union node:equal?
+              (map cdr (map edge:get-nodes (graph:get-outgoing-edges graph node)))
+              (map car (map edge:get-nodes (graph:get-incoming-edges graph node)))))
+              
 (define graph:get-edges
   (property-getter graph:edges graph?))
 
@@ -92,6 +116,12 @@
   (find (lambda (edge) (equal? edge-label (edge:get-label edge)))
         (graph:get-edges graph)))
 
+(define (graph:get-edges-from-nodes graph node1 node2)
+  (filter (lambda (edge) (and
+                          (edge:has-node? edge node1)
+                          (edge:has-node? edge node2)))
+          (graph:get-edges graph)))
+  
 ;;;; Graph predicates
 
 (define (graph:contains-node? graph node)
