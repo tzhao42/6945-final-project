@@ -34,22 +34,51 @@ the gist is that graph:update will create a new graph per update iteration
 and that node:update and edge:update should only mutate that graph
 and the process is repeated until convergence
 TODO: maybe worth setting an iteration cap? |#
+
+(define graph:update-iteration-cap 10)
+
 (define graph:update
   (most-specific-generic-procedure
-   'graph:update 1
+   'graph:update 2
    (error-generic-procedure-handler 'graph:update)))
 
+(define (%graph:single-update graph)
+  (guarantee graph? graph)
+  (for-each (lambda (node)
+              (node:update graph node))
+            (graph:get-nodes graph))
+  (for-each (lambda (edge)
+              (edge:update graph edge))
+            (graph:get-edges graph)))
+
 (define-generic-procedure-handler graph:update
-  (match-args graph?)
-  (lambda (graph)
-    (let ((graph-copy (graph:copy graph)))
-      (for-each (lambda (node)
-                  (node:update graph node))
-                (graph:get-nodes graph))
-      (for-each (lambda (edge)
-                  (edge:update graph edge))
-                (graph:get-edges graph))
-      (if (not (graph:equal? graph graph-copy))
-          (graph:update graph)
-          'done)))
+  (match-args graph? n:exact-nonnegative-integer?)
+  (lambda (graph iter-left)
+    (if (= iter-left 0)
+        (begin
+          (display "Graph updater has hit max iteration cap")
+          'done-capped)
+        (let ((graph-copy (graph:copy graph)))
+          (%graph:single-update graph)
+          (if (not (graph:equal? graph graph-copy))
+              (graph:update graph (- iter-left 1))
+              'done)))))
               
+(define (graph:converge graph)
+  (graph:update graph graph:update-iteration-cap))
+
+(define (graph:memory-step graph memory)
+  (%graph:single-update graph)
+  (lset-adjoin graph:equal? memory (graph:copy graph)))
+
+(define (graph:equilibrate graph)
+  (define (equilibrate graph memory iter-left)
+    (if (= 0 iter-left)
+        memory
+        (let ((new-memory (graph:memory-step graph memory)))
+          (if (lset= graph:equal? memory new-memory)
+              memory
+              (equilibrate graph new-memory (- iter-left 1))))))
+  (if (equal? 'done-capped (graph:converge graph))
+      (equilibrate graph '() graph:update-iteration-cap)
+      (list graph)))
