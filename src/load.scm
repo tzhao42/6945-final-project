@@ -32,4 +32,6 @@
       "graph/node"
       "graph/edge"
       "graph/graph"
-      "graph/update"))))
+      "graph/update"))
+   (load
+    '("molecules/molecules"))))
