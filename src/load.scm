@@ -34,4 +34,7 @@
       "graph/graph"
       "graph/update"))
    (load
-    '("molecules/molecules"))))
+    '("molecules/molecules"))
+   (load
+    '("serialize/serialize"))
+    ))
