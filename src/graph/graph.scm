@@ -104,14 +104,36 @@
 (define (graph:get-node-edges graph node)
   (guarantee graph? graph)
   (guarantee node? node)
-  (append (graph:get-outgoing-edges graph node) (graph:get-incoming-edges graph node)))
+  (lset-union edge:equal? (graph:get-outgoing-edges graph node) (graph:get-incoming-edges graph node)))
 
 (define (graph:get-neighbors graph node)
   (guarantee graph? graph)
   (guarantee node? node)
-  (lset-union node:equal?
-              (map cdr (map edge:get-nodes (graph:get-outgoing-edges graph node)))
-              (map car (map edge:get-nodes (graph:get-incoming-edges graph node)))))
+  (let ((outgoing-edge-nodes (map edge:get-nodes (graph:get-outgoing-edges graph node)))
+        (incoming-edge-nodes (map edge:get-nodes (graph:get-incoming-edges graph node))))
+    (lset-union node:equal?
+                (map cdr outgoing-edge-nodes)
+                (map car incoming-edge-nodes))))
+
+(define (graph:get-neighbors-strict graph node)
+  (guarantee graph? graph)
+  (guarantee node? node)
+  (let ((neighbors-nonstrict (graph:get-neighbors graph node)))
+    (delv node neighbors-nonstrict)))
+
+(define (graph:has-self-edge? graph node)
+  (guarantee graph? graph)
+  (guarantee node? node)
+  (any (lambda (edge) (node:equal? (edge:get-source edge)
+                                   (edge:get-destination edge)))
+       (graph:get-incoming-edges graph node)))
+
+(define (graph:get-self-edges graph node)
+  (guarantee graph? graph)
+  (guarantee node? node)
+  (filter (lambda (edge) (node:equal? (edge:get-source edge)
+                                      (edge:get-destination edge)))
+        (graph:get-incoming-edges graph node)))
               
 (define graph:get-edges
   (property-getter graph:edges graph?))
@@ -181,7 +203,7 @@
 (define %graph:set-nodes!
   (property-setter graph:nodes graph? list-of-nodes?))
 
-(define (graph:set-nodes! nodes graph)
+(define (graph:set-nodes! graph nodes)
   (assert (valid-graph-components? nodes (graph:get-edges graph)))
   (%graph:set-nodes! graph nodes))
 
@@ -212,7 +234,7 @@
   (if (graph:contains-node? graph node)
       (let ((relevant-edges (filter (lambda (edge) (edge:has-node? edge node))
                                     (graph:get-edges graph))))
-        (graph:remove-edges graph relevant-edges)
+        (graph:remove-edges! graph relevant-edges)
         (graph:set-nodes! graph (remove node (graph:get-nodes))))
       (error "Graph does not contain node")))
       
