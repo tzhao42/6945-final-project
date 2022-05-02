@@ -19,6 +19,8 @@
 
 (define eve (node:create 'label 'eve
                          'data 0))
+(graph:contains-node? ab-graph eve)
+(graph:add-node! ab-graph eve)
 
 (define ae-edge (edge:create 'label 'ae-edge
                              'source alice
@@ -45,13 +47,15 @@
 
 (graph:update! good-abe-graph)
 
+(define (predicate graph node)
+  (and (graph? graph) (node? node)))
+
 (define-generic-procedure-handler node:update!
-  (match-args graph? node?)
+  predicate
   (lambda (graph node)
     (node:set-data! node (+ 1 (node:get-data node)))
     (values))) 
 
-(define debug-output #f)
 (define good-abe-graph-2 (graph:copy good-abe-graph))
 (pp good-abe-graph)
 (pp good-abe-graph-2)
@@ -62,69 +66,3 @@
 
 (define equilib-graph-set (graph:equilibrate! good-abe-graph))
 (for-each pp equilib-graph-set)
-
-
-
-;;; Allylic cation
-
-(define allylic-cation
-  (let ((c1 (atom:create 'type 'C 'charge 0 'label "c1"))
-        (c2 (atom:create 'type 'C 'charge 0 'label "c2"))
-        (c3 (atom:create 'type 'C 'charge 1 'label "c3")))
-    (let ((g
-           (graph:create 'nodes (list c1 c2 c3)
-                         'edges (list (edge:create 'label "c1-c2-1"
-                                                   'source c1
-                                                   'destination c2)
-                                      (edge:create 'label "c1-c2-2"
-                                                   'source c2
-                                                   'destination c1)
-                                      (edge:create 'label "c2-c3"
-                                                   'source c3
-                                                   'destination c2)))))
-      (for-each (lambda (node) (pp (graph:get-neighbors g node))) (list c1 c2 c3))
-      g)))
-      
-(%graph:single-update! allylic-cation)
-(pp allylic-cation)
-(graph:converge! allylic-cation)
-(pp (graph:equilibrate! allylic-cation))
-
-
-(define ketene
-  (let ((c1 (atom:create 'type 'C 'charge -1 'label "c1"))
-        (c2 (atom:create 'type 'C 'charge 0 'label "c2"))
-        (c3 (atom:create 'type 'C 'charge 1 'label "c3")))
-    (let ((g
-           (graph:create 'nodes (list c1 c2 c3)
-                         'edges (list (edge:create 'label "c1-c2-1"
-                                                   'source c1
-                                                   'destination c2)
-                                      (edge:create 'label "c1-c2-2"
-                                                   'source c2
-                                                   'destination c1)
-                                      (edge:create 'label "c1-c2-3"
-                                                   'source c2
-                                                   'destination c1)
-                                      (edge:create 'label "c2-c3"
-                                                   'source c3
-                                                   'destination c2)))))
-      (for-each (lambda (node) (pp (graph:get-neighbors g node))) (list c1 c2 c3))
-      g)))
-
-(%graph:single-update! ketene)
-(pp ketene)
-
-
-(define ethene
-  (let ((c1 (atom:create 'type 'C 'charge -1 'label "c1"))
-        (c2 (atom:create 'type 'C 'charge +1 'label "c2")))
-    (let ((g
-           (graph:create 'nodes (list c1 c2)
-                         'edges (list (edge:create 'label "c1-c2"
-                                                   'source c1
-                                                   'destination c2)))))
-      g)))
-
-(%graph:single-update! ethene)
-(pp ethene)
