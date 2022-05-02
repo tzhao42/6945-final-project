@@ -208,10 +208,12 @@ along with SDF.  If not, see <https://www.gnu.org/licenses/>.
           (binding value))))
     procedure))
 
+(define debug-output #f) ; default don't print anything need this
+
 (define (%binding-set-prefix property new-value old-value object)
   (if debug-output
       (begin
-        (send-message! (list ";setting" (possessive object)
+        (send-message! (list ";setting" object
                              (property-name property)
                              "to" new-value)
                        debug-output)
