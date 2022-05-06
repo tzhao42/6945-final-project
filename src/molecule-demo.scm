@@ -1,34 +1,67 @@
 (load "load")
 
-;;; Allylic cation
 
-(define allylic-cation
+;;;; Implicit hydrogen test
+(define (add-implicit-hydrogen-test)
+  (let ((c1 (atom:create 'type 'C 'charge -1 'label "c1")))
+    (let ((methyl-anion
+           (graph:create 'nodes (list c1)
+                         'edges '())))
+      (add-implicit-hydrogens! methyl-anion)
+      (pp methyl-anion))))
+(add-implicit-hydrogen-test)
+
+
+;;;; Formal Charge computation
+;;; Methyl anion
+(define methyl-anion
   (let ((c1 (atom:create 'type 'C 'charge 0 'label "c1"))
-        (c2 (atom:create 'type 'C 'charge 0 'label "c2"))
-        (c3 (atom:create 'type 'C 'charge 1 'label "c3")))
+        (h1 (atom:create 'type 'H 'charge 0 'label "h1"))
+        (h2 (atom:create 'type 'H 'charge 0 'label "h2"))
+        (h3 (atom:create 'type 'H 'charge 0 'label "h3")))
     (let ((g
-           (graph:create 'nodes (list c1 c2 c3)
-                         'edges (list (edge:create 'label "c1-c2-1"
+           (graph:create 'nodes (list c1 h1 h2 h3)
+                         'edges (list (edge:create 'label "c1 lone pair"
                                                    'source c1
-                                                   'destination c2)
-                                      (edge:create 'label "c1-c2-2"
-                                                   'source c2
                                                    'destination c1)
-                                      (edge:create 'label "c2-c3"
-                                                   'source c3
-                                                   'destination c2)))))
-      (pp g)
-      (add-implicit-hydrogens! g)
-      (pp g)
+                                      (edge:create 'label "c1-h1"
+                                                   'source c1
+                                                   'destination h1)
+                                      (edge:create 'label "c1-h3"
+                                                   'source c1
+                                                   'destination h3)
+                                      (edge:create 'label "c1-h2"
+                                                   'source c1
+                                                   'destination h2)))))
       g)))
-      
-(%graph:single-update! allylic-cation)
-(pp allylic-cation)
-(graph:converge! allylic-cation)
-(pp (graph:equilibrate! allylic-cation))
+(pp methyl-anion)
+(%graph:single-update! methyl-anion)
+
+;;; Methyl Cation
+(define methyl-cation
+  (let ((c1 (atom:create 'type 'C 'charge 0 'label "c1"))
+        (h1 (atom:create 'type 'H 'charge 0 'label "h1"))
+        (h2 (atom:create 'type 'H 'charge 0 'label "h2"))
+        (h3 (atom:create 'type 'H 'charge 0 'label "h3")))
+    (let ((g
+           (graph:create 'nodes (list c1 h1 h2 h3)
+                         'edges (list (edge:create 'label "c1-h1"
+                                                   'source c1
+                                                   'destination h1)
+                                      (edge:create 'label "c1-h3"
+                                                   'source c1
+                                                   'destination h3)
+                                      (edge:create 'label "c1-h2"
+                                                   'source c1
+                                                   'destination h2)))))
+      g)))
+(pp methyl-cation)
+(%graph:single-update! methyl-cation)
 
 
-(define ketene
+;;;; Bond formation / Molecular Stabilization
+;;; ketene but much more unstable
+(define ketene-ish
   (let ((c1 (atom:create 'type 'C 'charge -1 'label "c1"))
         (c2 (atom:create 'type 'C 'charge 0 'label "c2"))
         (c3 (atom:create 'type 'C 'charge 1 'label "c3")))
@@ -50,11 +83,10 @@
       (add-implicit-hydrogens! g)
       (pp g)
       g)))
+(graph:converge! ketene-ish)
+(pp ketene-ish)
 
-(%graph:single-update! ketene)
-(pp ketene)
-
-
+;;; Unstable ethene
 (define ethene
   (let ((c1 (atom:create 'type 'C 'charge 0 'label "c1"))
         (h1 (atom:create 'type 'H 'charge 0 'label "h1"))
@@ -82,65 +114,12 @@
                                       (edge:create 'label "c2-h4"
                                                    'source c2
                                                    'destination h4)))))
+      (pp g)
       g)))
-
 (%graph:single-update! ethene)
 (pp ethene)
 
-(define methyl-cation
-  (let ((c1 (atom:create 'type 'C 'charge 0 'label "c1"))
-        (h1 (atom:create 'type 'H 'charge 0 'label "h1"))
-        (h2 (atom:create 'type 'H 'charge 0 'label "h2"))
-        (h3 (atom:create 'type 'H 'charge 0 'label "h3")))
-    (let ((g
-           (graph:create 'nodes (list c1 h1 h2 h3)
-                         'edges (list (edge:create 'label "c1-h1"
-                                                   'source c1
-                                                   'destination h1)
-                                      (edge:create 'label "c1-h3"
-                                                   'source c1
-                                                   'destination h3)
-                                      (edge:create 'label "c1-h2"
-                                                   'source c1
-                                                   'destination h2)))))
-      g)))
-
-(pp methyl-cation)
-(%graph:single-update! methyl-cation)
-
-(define methyl-anion
-  (let ((c1 (atom:create 'type 'C 'charge 0 'label "c1"))
-        (h1 (atom:create 'type 'H 'charge 0 'label "h1"))
-        (h2 (atom:create 'type 'H 'charge 0 'label "h2"))
-        (h3 (atom:create 'type 'H 'charge 0 'label "h3")))
-    (let ((g
-           (graph:create 'nodes (list c1 h1 h2 h3)
-                         'edges (list (edge:create 'label "c1 lone pair"
-                                                   'source c1
-                                                   'destination c1)
-                                      (edge:create 'label "c1-h1"
-                                                   'source c1
-                                                   'destination h1)
-                                      (edge:create 'label "c1-h3"
-                                                   'source c1
-                                                   'destination h3)
-                                      (edge:create 'label "c1-h2"
-                                                   'source c1
-                                                   'destination h2)))))
-      g)))
-
-(pp methyl-anion)
-(%graph:single-update! methyl-anion)
-
-(define (add-implicit-hydrogen-test)
-  (let ((c1 (atom:create 'type 'C 'charge -1 'label "c1")))
-    (let ((methyl-anion
-           (graph:create 'nodes (list c1)
-                         'edges '())))
-      (add-implicit-hydrogens! methyl-anion)
-      (pp methyl-anion))))
-(add-implicit-hydrogen-test)
-
+;;;; Same unstable ethene, but specified with fewer inputs
 (define ethene2
   (let ((c1 (atom:create 'type 'C 'charge -1 'label "c1"))
         (c2 (atom:create 'type 'C 'charge 1 'label "c2")))
@@ -154,6 +133,32 @@
 (pp ethene2)
 (%graph:single-update! ethene2)
 
+
+;;;; Resonance Examples
+;;; Allylic cation
+(define allylic-cation
+  (let ((c1 (atom:create 'type 'C 'charge 0 'label "c1"))
+        (c2 (atom:create 'type 'C 'charge 0 'label "c2"))
+        (c3 (atom:create 'type 'C 'charge 1 'label "c3")))
+    (let ((g
+           (graph:create 'nodes (list c1 c2 c3)
+                         'edges (list (edge:create 'label "c1-c2-1"
+                                                   'source c1
+                                                   'destination c2)
+                                      (edge:create 'label "c1-c2-2"
+                                                   'source c2
+                                                   'destination c1)
+                                      (edge:create 'label "c2-c3"
+                                                   'source c3
+                                                   'destination c2)))))
+      (pp g)
+      (add-implicit-hydrogens! g)
+      (pp g)
+      g)))
+(%graph:single-update! allylic-cation)
+(pp allylic-cation)
+
+;;; Phenyl cation
 (define benzene
   (let ((c1 (atom:create 'type 'C 'charge 0 'label "c1"))
         (c2 (atom:create 'type 'C 'charge 0 'label "c2"))
@@ -192,6 +197,5 @@
       (add-implicit-hydrogens! g)
       (pp g)
       g)))
-
-(pp benzene)
 (%graph:single-update! benzene)
+(pp benzene)
