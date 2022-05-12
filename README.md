@@ -7,8 +7,8 @@ All source code lives in `src`. Sections of the SDF codebase have been copied ov
 
 ## How to Use
 
-There are two ways of running `run.scm`. The first is to open up a REPL separately, and then run each statement in `run.scm`. This works, but requires that the REPL be initialized properly with the statement `(load "[path-to-load.scm]")`.
+We have several demos demonstrating the capabilties of our code. The first is in `src/molecule-demo.scm`, which demonstrates some of the molecular manipuations we are able to do using a molecular representation extension of our library. 
 
-The other way of running `run.scm` is to run (in terminal) `mit-scheme --silent --load run.scm`, which has the benefit of being able to use the statement `(load "load")`, rather than inserting the path to `load.scm` in the load statement.
+The second is in `src/save-demo-1.scm` and `src/save-demo-2.scm`. The first demo creates graph objects which are then saved to a save file `save-demo.save`, and the second demo reloads those objects.
 
 
